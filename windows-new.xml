@@ -5,25 +5,40 @@
   <memory unit="GB">8</memory>
   <currentMemory unit="GB">8</currentMemory>
   <os>
-  <type arch="x86_64" machine="q35">hvm</type>
-  <loader>/usr/share/qemu/bios.bin</loader>
-  <bootmenu enable="yes" />
+      <type arch="x86_64" machine="q35">hvm</type>
+      <loader>/usr/share/qemu/bios.bin</loader>
+      <bootmenu enable="yes" />
   </os>
   <features>
+    <!-- helps windows -->
     <hyperv>
 	    <relaxed state="on" />
 	    <vapic state="on" />
 	    <spinlocks state="on" retries="8191" />
     </hyperv>
+    <!-- support power management -->
     <acpi />
+    <!-- access more than 4GB of memory -->
     <pae/>
+    <!-- programming IRQ management -->
     <apic/>
     <kvm><hidden state='on'/></kvm>
   </features>
-  <cpu mode="host-passthrough"> 
-	  <vcpu placement="static">2</vcpu>
-	  <topology sockets="1" cores="1" threads="2" />
+  <!--
+  <cpu mode="custom"> 
+      <model fallback="allow">core2duo</model>
+      <topology sockets="1" cores="2" threads="1" />
   </cpu>
+  -->
+  <cpu mode="host-passthrough"> 
+      <topology sockets="1" cores="2" threads="1" />
+  </cpu>
+  <vcpu placement="static" current="2">2</vcpu>
+  <cputune>
+      <vcpupin vcpu="0" cpuset="2"/>
+      <vcpupin vcpu="1" cpuset="3"/>
+      <emulatorpin cpuset="2"/>
+  </cputune> 
   <clock offset="localtime">
 	  <timer name="hypervclock" present="yes" />
   </clock>
@@ -59,11 +74,9 @@
 	  </disk>
   </devices>
   <qemu:commandline>
-  <qemu:arg value="-device" />
-  <qemu:arg value="ioh3420,bus=pcie.0,addr=1c.0,port=1,chassis=1,id=root.1" />
-  <qemu:arg value="-device" />
-  <qemu:arg value="vfio-pci,host=01:00.0,bus=root.1,addr=00.0,x-vga=on" />
-  <qemu:arg value="-cpu" />
-  <qemu:arg value="host" />
+      <qemu:arg value="-device" />
+      <qemu:arg value="ioh3420,bus=pcie.0,addr=1c.0,port=1,chassis=1,id=root.1" />
+      <qemu:arg value="-device" />
+      <qemu:arg value="vfio-pci,host=01:00.0,bus=root.1,addr=00.0,x-vga=on" />
   </qemu:commandline>
 </domain>
